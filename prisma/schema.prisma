@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+model Renda {
+  id           String   @id @default(uuid())
+  descricao    String
+  valor        Decimal  @db.Decimal(12, 2)
+  categoria    String   // ex.: salário, freelance, rendimentos
+  moeda        String   @default("BRL")
+  data         DateTime @default(now())
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
+model Debito {
+  id           String   @id @default(uuid())
+  descricao    String
+  valor        Decimal  @db.Decimal(12, 2)
+  categoria    String   // ex.: moradia, alimentação, transporte
+  moeda        String   @default("BRL")
+  pago         Boolean  @default(false)
+  data         DateTime @default(now())
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
+model Investimento {
+  id           String   @id @default(uuid())
+  descricao    String
+  valor        Decimal  @db.Decimal(12, 2)
+  tipo         String   // ex.: renda fixa, ações, cripto
+  instituicao  String?  // opcional — banco/corretora
+  moeda        String   @default("BRL")
+  data         DateTime @default(now())
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
