@@ -4,10 +4,14 @@ type Lancamento = {
   valor: string;
   categoria?: string;
   tipo?: string;
+  data?: string;
 };
 
 const formatar = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+const formatarData = (iso?: string) =>
+  iso ? new Date(iso).toLocaleDateString("pt-BR") : "";
 
 export default function ListaLancamentos({
   titulo,
@@ -29,7 +33,10 @@ export default function ListaLancamentos({
             <li key={item.id} className="flex items-center justify-between gap-4 py-2">
               <div className="min-w-0">
                 <p className="font-medium truncate">{item.descricao}</p>
-                <p className="text-xs text-gray-500">{item.categoria ?? item.tipo}</p>
+                <p className="text-xs text-gray-500">
+                  {item.categoria ?? item.tipo}
+                  {item.data && ` · ${formatarData(item.data)}`}
+                </p>
               </div>
               <span className={`font-semibold shrink-0 ${cor}`}>
                 {formatar(Number(item.valor))}

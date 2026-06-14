@@ -57,7 +57,7 @@ export default function Header() {
         <ul className="p-2">
           <li><Link href="/" onClick={fechar} className="block rounded-lg px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Início</Link></li>
           <li><Link href="/lancamentos" onClick={fechar} className="block rounded-lg px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Lançamentos</Link></li>
-          <li><span className="block rounded-lg px-3 py-3 text-gray-400 dark:text-gray-600">Gráficos (em breve)</span></li>
+          <li><Link href="/graficos" onClick={fechar} className="block rounded-lg px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Gráficos</Link></li>
           <li><span className="block rounded-lg px-3 py-3 text-gray-400 dark:text-gray-600">Relatórios (em breve)</span></li>
         </ul>
       </nav>
