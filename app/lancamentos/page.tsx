@@ -38,7 +38,11 @@ export default function Lancamentos() {
   }, []);
 
   if (carregando) {
-    return <main className="p-6 max-w-md mx-auto"><p className="text-gray-500">Carregando...</p></main>;
+    return (
+      <main className="p-6 max-w-md mx-auto">
+        <p className="text-gray-500">Carregando...</p>
+      </main>
+    );
   }
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import FormularioLancamento from "./components/FormularioLancamento";
 
 type Lancamento = {
@@ -19,7 +20,6 @@ export default function Home() {
   const [mostrarSaldo, setMostrarSaldo] = useState(true);
   const [formAberto, setFormAberto] = useState<TipoForm>(null);
 
-  // agora é uma função nomeada — dá pra chamar de novo depois de salvar
   async function carregarDados() {
     try {
       const [r, d, i] = await Promise.all([
@@ -44,10 +44,8 @@ export default function Home() {
   const somar = (lista: Lancamento[]) =>
     lista.reduce((total, item) => total + Number(item.valor), 0);
 
-  const totalRendas = somar(rendas);
-  const totalDebitos = somar(debitos);
-  const totalInvestimentos = somar(investimentos);
-  const saldo = totalRendas - totalDebitos - totalInvestimentos;
+  const saldo = somar(rendas) - somar(debitos) - somar(investimentos);
+  const positivo = saldo >= 0;
 
   const formatar = (v: number) =>
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -62,73 +60,68 @@ export default function Home() {
 
   return (
     <main className="p-6 max-w-md mx-auto">
-      {/* Card de saldo */}
-      <div className="rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-500">Saldo atual</span>
+      {/* Card de saldo — contorno colorido conforme o saldo */}
+      <div className={`rounded-2xl border-2 p-6 shadow-sm ${positivo ? "border-green-500" : "border-red-500"}`}>
+        <div className="flex items-start justify-between">
+          <span className="text-sm text-gray-500">Seu Saldo Atual</span>
           <button
             onClick={() => setMostrarSaldo((v) => !v)}
-            className="text-sm text-blue-600 hover:underline"
+            aria-label={mostrarSaldo ? "Ocultar saldo" : "Mostrar saldo"}
+            className="text-gray-400 hover:text-gray-600"
           >
-            {mostrarSaldo ? "Ocultar" : "Mostrar"}
+            {mostrarSaldo ? <Eye size={20} /> : <EyeOff size={20} />}
           </button>
         </div>
-        <p className={`text-3xl font-bold ${saldo >= 0 ? "text-green-600" : "text-red-600"}`}>
+
+        <p className={`mt-2 text-4xl font-bold ${positivo ? "text-green-600" : "text-red-600"}`}>
           {mostrarSaldo ? formatar(saldo) : "R$ ••••••"}
         </p>
-        <div className="mt-6 grid grid-cols-3 gap-3 text-center text-sm">
-          <div>
-            <p className="text-gray-500">Rendas</p>
-            <p className="font-semibold text-green-600">{formatar(totalRendas)}</p>
-          </div>
-          <div>
-            <p className="text-gray-500">Débitos</p>
-            <p className="font-semibold text-red-600">{formatar(totalDebitos)}</p>
-          </div>
-          <div>
-            <p className="text-gray-500">Investido</p>
-            <p className="font-semibold text-blue-600">{formatar(totalInvestimentos)}</p>
-          </div>
-        </div>
+
+        <p className="mt-3 text-right text-sm text-gray-400">BRL</p>
       </div>
 
-      {/* Botões de cadastro rápido */}
-      <div className="mt-8 flex items-center justify-center gap-8">
-        <div className="flex flex-col items-center gap-1">
-          <button
-            onClick={() => setFormAberto("renda")}
-            aria-label="Nova renda"
-            className="w-14 h-14 rounded-full bg-green-600 text-white text-2xl flex items-center justify-center shadow-md hover:bg-green-700"
-          >
-            +
-          </button>
-          <span className="text-xs text-gray-500">Renda</span>
-        </div>
+      {/* Botões de cadastro rápido — layout em triângulo, igual ao mockup */}
+      <div className="relative mx-auto mt-12 h-56 w-64">
+        {/* $ azul — topo, centro */}
+        <button
+          onClick={() => setFormAberto("investimento")}
+          aria-label="Novo investimento"
+          className="absolute left-1/2 top-0 -translate-x-1/2 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-500 bg-white dark:bg-gray-900 text-3xl font-light text-blue-600 shadow-[0_0_18px_rgba(59,130,246,0.45)] transition hover:scale-105"
+        >
+          $
+        </button>
 
-        <div className="flex flex-col items-center gap-1">
-          <button
-            onClick={() => setFormAberto("debito")}
-            aria-label="Novo débito"
-            className="w-14 h-14 rounded-full bg-red-600 text-white text-2xl flex items-center justify-center shadow-md hover:bg-red-700"
-          >
-            −
-          </button>
-          <span className="text-xs text-gray-500">Débito</span>
-        </div>
+        {/* − vermelho — base, esquerda */}
+        <button
+          onClick={() => setFormAberto("debito")}
+          aria-label="Novo débito"
+          className="absolute bottom-0 left-0 flex h-20 w-20 items-center justify-center rounded-full border-4 border-red-500 bg-white dark:bg-gray-900 text-3xl font-light text-red-600 shadow-[0_0_18px_rgba(239,68,68,0.45)] transition hover:scale-105"
+        >
+          −
+        </button>
 
-        <div className="flex flex-col items-center gap-1">
-          <button
-            onClick={() => setFormAberto("investimento")}
-            aria-label="Novo investimento"
-            className="w-14 h-14 rounded-full bg-blue-600 text-white text-2xl flex items-center justify-center shadow-md hover:bg-blue-700"
-          >
-            $
-          </button>
-          <span className="text-xs text-gray-500">Investir</span>
-        </div>
+        {/* + verde — base, direita */}
+        <button
+          onClick={() => setFormAberto("renda")}
+          aria-label="Nova renda"
+          className="absolute bottom-0 right-0 flex h-20 w-20 items-center justify-center rounded-full border-4 border-green-500 bg-white dark:bg-gray-900 text-3xl font-light text-green-600 shadow-[0_0_18px_rgba(34,197,94,0.45)] transition hover:scale-105"
+        >
+          +
+        </button>
       </div>
 
-      {/* O formulário só existe quando um tipo está selecionado */}
+      {/* Botão Dicas de IA — placeholder (Fase 3) */}
+      <button
+        disabled
+        title="Em breve (Fase 3)"
+        className="fixed bottom-6 right-6 flex cursor-not-allowed flex-col items-center gap-1"
+      >
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-sm font-bold text-white shadow-[0_0_18px_rgba(139,92,246,0.5)]">
+          IA
+        </span>
+        <span className="text-xs text-gray-500">Dicas de IA</span>
+      </button>
+
       {formAberto && (
         <FormularioLancamento
           tipo={formAberto}

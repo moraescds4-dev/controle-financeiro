@@ -25,10 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="pt-BR"
+      lang="pt-BR" suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col"><Header />{children}</body>
+      <body className="min-h-full flex flex-col"><script
+  dangerouslySetInnerHTML={{
+    __html: `try{if(localStorage.getItem('tema')==='escuro'){document.documentElement.classList.add('dark')}}catch(e){}`,
+  }}
+/><Header />{children}</body>
     </html>
   );
 }
