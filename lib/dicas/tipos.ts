@@ -16,7 +16,12 @@ export type ResumoFinanceiro = {
   totalInvestido: number;
   saldo: number;
   debitosPorCategoria: Record<string, number>; // { "Moradia": 1200, "Lazer": 300 }
-  mesLabel: string;                             // ex.: "junho"
+  mesLabel: string; 
+  anterior: {
+    totalRendas: number;
+    totalDebitos: number;
+    totalInvestido: number;
+  };                            // ex.: "junho"
 };
 
 // Uma regra: olha o resumo e devolve uma Dica, OU null se não se aplica.

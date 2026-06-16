@@ -17,38 +17,47 @@ export function montarResumo(
   rendas: LancamentoCru[],
   debitos: LancamentoCru[],
   investimentos: LancamentoCru[],
-  dataRef: Date = new Date() // mês de referência; padrão = agora
+  dataRef: Date = new Date()
 ): ResumoFinanceiro {
-  const mes = dataRef.getMonth();      // 0 = janeiro ... 11 = dezembro
+  const mes = dataRef.getMonth();
   const ano = dataRef.getFullYear();
 
-  // mantém só os lançamentos do mês/ano de referência
-  const doMes = (lista: LancamentoCru[]) =>
+  // agora filtra por um mês/ano QUALQUER (reutilizável)
+  const doPeriodo = (lista: LancamentoCru[], m: number, a: number) =>
     lista.filter((l) => {
       const d = new Date(l.data);
-      return d.getMonth() === mes && d.getFullYear() === ano;
+      return d.getMonth() === m && d.getFullYear() === a;
     });
 
-  const rendasMes = doMes(rendas);
-  const debitosMes = doMes(debitos);
-  const investimentosMes = doMes(investimentos);
-
-  // soma SEMPRE convertendo string -> número
   const somar = (lista: LancamentoCru[]) =>
     lista.reduce((acc, l) => acc + Number(l.valor), 0);
+
+  // ───── mês atual ─────
+  const rendasMes = doPeriodo(rendas, mes, ano);
+  const debitosMes = doPeriodo(debitos, mes, ano);
+  const investimentosMes = doPeriodo(investimentos, mes, ano);
 
   const totalRendas = somar(rendasMes);
   const totalDebitos = somar(debitosMes);
   const totalInvestido = somar(investimentosMes);
 
-
   const debitosPorCategoria: Record<string, number> = {};
+  debitosMes.forEach((d) => {
+    const categoria = d.categoria ?? "Outros";
+    debitosPorCategoria[categoria] =
+      (debitosPorCategoria[categoria] ?? 0) + Number(d.valor);
+  });
 
-debitosMes.forEach((d) => {
-  const categoria = d.categoria ?? "Outros";
-  debitosPorCategoria[categoria] =
-    (debitosPorCategoria[categoria] ?? 0) + Number(d.valor);
-});
+  // ───── mês anterior ─────
+  // em janeiro (mês 0), o anterior é dezembro (11) do ano passado
+  const mesAnterior = mes === 0 ? 11 : mes - 1;
+  const anoAnterior = mes === 0 ? ano - 1 : ano;
+
+  const anterior = {
+    totalRendas: somar(doPeriodo(rendas, mesAnterior, anoAnterior)),
+    totalDebitos: somar(doPeriodo(debitos, mesAnterior, anoAnterior)),
+    totalInvestido: somar(doPeriodo(investimentos, mesAnterior, anoAnterior)),
+  };
 
   return {
     totalRendas,
@@ -57,5 +66,6 @@ debitosMes.forEach((d) => {
     saldo: totalRendas - totalDebitos - totalInvestido,
     debitosPorCategoria,
     mesLabel: MESES[mes],
+    anterior,
   };
 }
