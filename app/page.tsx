@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import FormularioLancamento from "./components/FormularioLancamento";
+import CardDicas from "./components/CardDicas";
 
 type Lancamento = {
   id: string;
@@ -19,6 +20,7 @@ export default function Home() {
   const [carregando, setCarregando] = useState(true);
   const [mostrarSaldo, setMostrarSaldo] = useState(true);
   const [formAberto, setFormAberto] = useState<TipoForm>(null);
+  const [mostrarDicas, setMostrarDicas] = useState(false);
 
   async function carregarDados() {
     try {
@@ -112,15 +114,35 @@ export default function Home() {
 
       {/* Botão Dicas de IA — placeholder (Fase 3) */}
       <button
-        disabled
-        title="Em breve (Fase 3)"
-        className="fixed bottom-6 right-6 flex cursor-not-allowed flex-col items-center gap-1"
-      >
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-sm font-bold text-white shadow-[0_0_18px_rgba(139,92,246,0.5)]">
-          IA
-        </span>
-        <span className="text-xs text-gray-500">Dicas de IA</span>
+       onClick={() => setMostrarDicas((v) => !v)}
+       title="Dicas de IA"
+       className="fixed bottom-6 right-6 flex flex-col items-center gap-1"
+      >  
+       <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-sm font-bold text-white shadow-[0_0_18px_rgba(139,92,246,0.5)]">
+         IA
+       </span>
+       <span className="text-xs text-gray-500">Dicas de IA</span>
       </button>
+
+      {mostrarDicas && (
+        <div className="fixed bottom-24 right-6 z-50 w-80 rounded-2xl border-2 border-purple-500 bg-white p-4 shadow-xl dark:bg-gray-900">
+          <div className="mb-3 flex items-center justify-between">
+           <h2 className="text-lg font-semibold text-purple-600">
+             Dicas de IA
+           </h2>
+
+           <button
+             onClick={() => setMostrarDicas(false)}
+             className="text-sm text-gray-400 hover:text-gray-600"
+             aria-label="Fechar dicas"
+           >
+             ✕
+           </button>
+          </div>
+
+          <CardDicas />
+        </div>
+      )}
 
       {formAberto && (
         <FormularioLancamento
