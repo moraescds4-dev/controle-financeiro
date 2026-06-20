@@ -10,7 +10,7 @@ const temDadosMesAnterior = (resumo: ResumoFinanceiro) =>
   resumo.anterior.totalDebitos > 0 ||
   resumo.anterior.totalInvestido > 0;
 
-const gastouMaisQueMesAnterior: Regra = (resumo) => {
+export const gastouMaisQueMesAnterior: Regra = (resumo) => {
   if (!temDadosMesAnterior(resumo)) return null;
   if (resumo.totalDebitos <= resumo.anterior.totalDebitos) return null;
   const diferenca = resumo.totalDebitos - resumo.anterior.totalDebitos;
@@ -47,7 +47,7 @@ const apertouOsGastos: Regra = (resumo) => {
 };
 
 // REGRA 1 (molde): gastou mais do que ganhou no mês
-const gastouMaisDoQueGanhou: Regra = (resumo) => {
+export const gastouMaisDoQueGanhou: Regra = (resumo) => {
   if (resumo.totalDebitos <= resumo.totalRendas) return null; // não se aplica
   const diferenca = resumo.totalDebitos - resumo.totalRendas;
   return {
@@ -114,7 +114,7 @@ const comprometeuAlemDaRenda: Regra = (resumo) => {
 };
 
 // REGRA 5
-const categoriaDevorouMetadeDaRenda: Regra = (resumo) => {
+export const categoriaDevorouMetadeDaRenda: Regra = (resumo) => {
   if (resumo.totalRendas <= 0) return null;
 
   for (const [categoria, valor] of Object.entries(resumo.debitosPorCategoria)) {
