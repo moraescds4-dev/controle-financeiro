@@ -14,4 +14,5 @@ export function gerarDicas(resumo: ResumoFinanceiro): Dica[] {
     .filter((dica): dica is Dica => dica !== null)
     .sort((a, b) => PRIORIDADE[a.severidade] - PRIORIDADE[b.severidade]);
   // se quiser limitar, adiciona no fim: .slice(0, 5)
+  
 }
