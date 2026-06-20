@@ -10,6 +10,7 @@ export default function Header() {
   const fechar = () => setAberto(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- lê o tema do DOM no client; document não existe no SSR
     setEscuro(document.documentElement.classList.contains("dark"));
   }, []);
 
