@@ -1,3 +1,4 @@
+import { gerarDicas } from "./motor";
 import { describe, it, expect } from "vitest";
 import {
   gastouMaisDoQueGanhou,
@@ -142,3 +143,30 @@ describe("gastouMaisQueMesAnterior", () => {
     expect(gastouMaisQueMesAnterior(resumo)).toBeNull();
   });
 });
+
+describe("gerarDicas (o motor)", () => {
+  it("não gera nenhuma dica quando o mês não teve movimento", () => {
+    const resumo = fazerResumo({}); // tudo zerado
+    expect(gerarDicas(resumo)).toEqual([]);
+  });
+
+  it("ordena as dicas por prioridade (alerta antes de info)", () => {
+    // renda zerada + débitos => dispara alerta(s); e há movimento => dispara o info "resumo do mês"
+    const resumo = fazerResumo({ totalRendas: 0, totalDebitos: 500 });
+    const severidades = gerarDicas(resumo).map((d) => d.severidade);
+
+    expect(severidades[0]).toBe("alerta");
+    expect(severidades.at(-1)).toBe("info");
+    
+  });
+
+  it("não limita por severidade: deixa passar mais de uma dica da mesma severidade", () => {
+    // este resumo dispara DOIS alertas: gastouMaisDoQueGanhou e rendaZeradaComGastos
+    const resumo = fazerResumo({ totalRendas: 0, totalDebitos: 500 });
+    const alertas = gerarDicas(resumo).filter((d) => d.severidade === "alerta");
+
+    expect(alertas.length).toBeGreaterThan(1);
+
+  });
+});
+
