@@ -1,8 +1,9 @@
 "use client";
 
+import GraficoComparativo from "@/app/components/GraficoComparativo";
 import { useEffect, useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+  Tooltip, ResponsiveContainer, Cell,
   PieChart, Pie, Legend,
 } from "recharts";
 
@@ -136,20 +137,7 @@ export default function Graficos() {
       {temDados && grafico === "comparativo" && (
         <section>
           <h2 className="text-lg font-semibold mb-3">Comparativo — {nomeMes}</h2>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparativo} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
-                <XAxis dataKey="nome" interval={0} angle={-20} textAnchor="end" height={50} tick={{ fill: "currentColor", fontSize: 12 }} />
-                <YAxis width={100} tick={{ fill: "currentColor", fontSize: 12 }} tickFormatter={(v) => formatar(Number(v))} />
-                <Tooltip formatter={(v) => formatar(Number(v))} contentStyle={{ borderRadius: 8 }} />
-                <Bar dataKey="total" radius={[6, 6, 0, 0]} maxBarSize={70}>
-                  {comparativo.map((d) => (
-                    <Cell key={d.nome} fill={d.cor} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <GraficoComparativo dados={comparativo} />
         </section>
       )}
 
