@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GraficoComparativo from "@/app/components/GraficoComparativo";
 import { montarRelatorio } from "@/lib/relatorio/relatorio";
 import type { RelatorioMensal } from "@/lib/relatorio/tipos";
+import { toPng } from "html-to-image";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 type Lancamento = { valor: string; categoria?: string; tipo?: string; data: string; descricao: string };
 type LancamentoComData = {
   data: string;
@@ -76,6 +80,7 @@ export default function RelatoriosPage() {
   const [investimentos, setInvestimentos] = useState<Lancamento[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [mes, setMes] = useState<"atual" | "anterior">("atual");
+  const graficoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function carregar() {
@@ -130,6 +135,72 @@ export default function RelatoriosPage() {
         : "border border-gray-300 text-gray-600 dark:border-gray-700 dark:text-gray-300"
     }`;
 
+   async function exportarPdf() {
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const margem = 14;
+  const larguraUtil = pdf.internal.pageSize.getWidth() - margem * 2;
+  let y = margem; // posição vertical atual; vai descendo conforme desenhamos
+
+  // --- Título ---
+  pdf.setFontSize(16);
+  pdf.text(`Relatório — ${relatorio.mesLabel}`, margem, y);
+  y += 10;
+
+  // --- Gráfico (a única parte fotografada) ---
+  const elemento = graficoRef.current;
+  if (elemento) {
+    const html = document.documentElement;
+    const eraEscuro = html.classList.contains("dark");
+    if (eraEscuro) html.classList.remove("dark");
+    try {
+      const imagem = await toPng(elemento, { backgroundColor: "#ffffff", pixelRatio: 2 });
+      const props = pdf.getImageProperties(imagem);
+      const alturaImg = (props.height * larguraUtil) / props.width;
+      pdf.addImage(imagem, "PNG", margem, y, larguraUtil, alturaImg);
+      y += alturaImg + 8;
+    } finally {
+      if (eraEscuro) html.classList.add("dark");
+    }
+  }
+
+  // --- Panorama (tabela de 4 linhas) ---
+  autoTable(pdf, {
+    startY: y,
+    head: [["Panorama", "Valor"]],
+    body: [
+      ["Rendas", formatarMoeda(relatorio.panorama.rendas)],
+      ["Débitos", formatarMoeda(relatorio.panorama.debitos)],
+      ["Investido", formatarMoeda(relatorio.panorama.investido)],
+      ["Saldo", formatarMoeda(relatorio.panorama.saldo)],
+    ],
+    margin: { left: margem, right: margem },
+    columnStyles: { 1: { halign: "right" } },
+  });
+
+  // --- Uma tabela por seção, com os itens ---
+  relatorio.secoes.forEach((secao) => {
+    const linhas: string[][] = [];
+    secao.grupos.forEach((grupo) => {
+      // linha de subtotal da categoria
+      linhas.push([grupo.categoria, "", formatarMoeda(grupo.subtotal)]);
+      // linhas dos itens
+      grupo.itens.forEach((item) => {
+        linhas.push([formatarDataCurta(item.data), item.descricao, formatarMoeda(Number(item.valor))]);
+      });
+    });
+
+    autoTable(pdf, {
+      head: [[`${secao.titulo}`, "", formatarMoeda(secao.total)]],
+      body: linhas,
+      margin: { left: margem, right: margem },
+      columnStyles: { 2: { halign: "right" } },
+    });
+  });
+
+  pdf.save(`relatorio-${relatorio.mesLabel}.pdf`);
+}
+
+
   return (
     <main style={{ padding: "32px" }}>
       <h1>Relatório — {relatorio.mesLabel}</h1>
@@ -137,8 +208,11 @@ export default function RelatoriosPage() {
         <div className="flex gap-2 mb-6">
           <button onClick={() => setMes("atual")} className={abaClasse(mes === "atual")}>Mês atual</button>
           <button onClick={() => setMes("anterior")} className={abaClasse(mes === "anterior")}>Mês anterior</button>
+          <button onClick={exportarPdf} className="mb-6 px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium">
+  Exportar PDF
+</button>
         </div>
-
+        
       <section
         style={{
           display: "grid",
@@ -168,7 +242,9 @@ export default function RelatoriosPage() {
         </div>
       </section>
 
-       <GraficoComparativo dados={comparativo} mostrarTooltip={false} />
+       <div ref={graficoRef}>
+         <GraficoComparativo dados={comparativo} mostrarTooltip={false} />
+       </div>
        
       <section style={{ marginTop: "32px" }}>
        {relatorio.secoes.map((secao) => (
@@ -234,12 +310,12 @@ export default function RelatoriosPage() {
                   </strong>
                 </div>
               ))}
-            </div>
-          ))
-        )}
-       </section>
+              </div>
+            ))
+          )}
+        </section>
       ))}
-     </section>
-    </main>
+    </section>
+</main>
   );
 }
