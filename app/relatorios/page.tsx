@@ -168,7 +168,7 @@ export default function RelatoriosPage() {
         </div>
       </section>
 
-       <GraficoComparativo dados={comparativo} />
+       <GraficoComparativo dados={comparativo} mostrarTooltip={false} />
        
       <section style={{ marginTop: "32px" }}>
        {relatorio.secoes.map((secao) => (
