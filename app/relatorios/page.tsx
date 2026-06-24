@@ -142,7 +142,7 @@ export default function RelatoriosPage() {
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
           gap: "16px",
           marginTop: "24px",
         }}
