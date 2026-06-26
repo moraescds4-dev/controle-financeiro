@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import GraficoComparativo from "@/app/components/GraficoComparativo";
+import { formatarMoeda } from "@/lib/formato";
 import { montarRelatorio } from "@/lib/relatorio/relatorio";
 import type { RelatorioMensal } from "@/lib/relatorio/tipos";
 import { toPng } from "html-to-image";
@@ -12,13 +13,6 @@ type Lancamento = { valor: string; categoria?: string; tipo?: string; data: stri
 type LancamentoComData = {
   data: string;
 };
-
-function formatarMoeda(valor: number) {
-  return valor.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-}
 
 function estaNoMesAtual(data: string) {
   const hoje = new Date();

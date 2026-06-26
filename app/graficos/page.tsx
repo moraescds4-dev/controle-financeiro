@@ -1,6 +1,7 @@
 "use client";
 
 import GraficoComparativo from "@/app/components/GraficoComparativo";
+import { formatarMoeda } from "@/lib/formato";
 import { useEffect, useState } from "react";
 import {
   Tooltip, ResponsiveContainer, Cell,
@@ -52,9 +53,6 @@ export default function Graficos() {
     }
     carregar();
   }, []);
-
-  const formatar = (v: number) =>
-    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   const hoje = new Date();
   const alvo = new Date(hoje.getFullYear(), hoje.getMonth() - (mes === "anterior" ? 1 : 0), 1);
@@ -165,7 +163,7 @@ export default function Graficos() {
                       <Cell key={item.nome} fill={PALETAS[categoriaDe][index % PALETAS[categoriaDe].length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(v) => formatar(Number(v))} contentStyle={{ borderRadius: 8 }} />
+                   <Tooltip formatter={(v) => formatarMoeda(Number(v))} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>

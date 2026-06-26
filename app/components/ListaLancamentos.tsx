@@ -7,8 +7,7 @@ type Lancamento = {
   data?: string;
 };
 
-const formatar = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+import { formatarMoeda } from "@/lib/formato";
 
 const formatarData = (iso?: string) =>
   iso ? new Date(iso).toLocaleDateString("pt-BR") : "";
@@ -39,7 +38,9 @@ export default function ListaLancamentos({
                 </p>
               </div>
               <span className={`font-semibold shrink-0 ${cor}`}>
-                {formatar(Number(item.valor))}
+              <span className={`font-semibold shrink-0 ${cor}`}>
+                 {formatarMoeda(Number(item.valor))}
+              </span>
               </span>
             </li>
           ))}
