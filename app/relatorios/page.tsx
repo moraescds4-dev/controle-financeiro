@@ -4,68 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import GraficoComparativo from "@/app/components/GraficoComparativo";
 import { formatarMoeda } from "@/lib/formato";
 import { montarRelatorio } from "@/lib/relatorio/relatorio";
-import type { RelatorioMensal } from "@/lib/relatorio/tipos";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 type Lancamento = { valor: string; categoria?: string; tipo?: string; data: string; descricao: string };
-type LancamentoComData = {
-  data: string;
-};
-
-function estaNoMesAtual(data: string) {
-  const hoje = new Date();
-  const dataItem = new Date(data);
-
-  return (
-    dataItem.getMonth() === hoje.getMonth() &&
-    dataItem.getFullYear() === hoje.getFullYear()
-  );
-}
-
-function obterMesLabel() {
-  const hoje = new Date();
-
-  return hoje.toLocaleDateString("pt-BR", {
-    month: "long",
-    year: "numeric",
-  });
-}
 
 function formatarDataCurta(data: string) {
   return new Date(data).toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
   });
-}
-
-async function buscarLista(url: string) {
-  const resposta = await fetch(url);
-
-  if (!resposta.ok) {
-    throw new Error(`Erro ao buscar ${url}`);
-  }
-
-  const dados = await resposta.json();
-
-  if (Array.isArray(dados)) {
-    return dados;
-  }
-
-  if (Array.isArray(dados.rendas)) {
-    return dados.rendas;
-  }
-
-  if (Array.isArray(dados.debitos)) {
-    return dados.debitos;
-  }
-
-  if (Array.isArray(dados.investimentos)) {
-    return dados.investimentos;
-  }
-
-  return [];
 }
 
 export default function RelatoriosPage() {
