@@ -51,9 +51,6 @@ import type {
   SecaoRelatorio,
 } from "./tipos";
 
-// Ajuste os imports conforme já existem no seu projeto
-import type { Renda, Debito, Investimento } from "@/app/generated/prisma/client";
-
 export function montarRelatorio(dados: {
   rendas: LancamentoEntrada[];
   debitos: LancamentoEntrada[];
